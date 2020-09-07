@@ -14,6 +14,7 @@ Examples of some default directories are (but not limited to):
 The `sys` module, however, is a builtin that is written in and compiled in C for
 performance. Because of this, you will not find this in the default directories.
 """
+'''
 import sys
 import time
 # By appending the folder of all the GrovePi libraries to the system path here,
@@ -36,3 +37,16 @@ if __name__ == '__main__':
         time.sleep(0.2)
 
         print(grovepi.ultrasonicRead(PORT))
+'''
+from grove_rgb_lcd import *
+
+setText("Hello world\nLCD test")
+setRGB(0,128,64)
+
+# Slowly change the colors every 0.01 seconds.
+for c in range(0,255):
+    setRGB(c,255-c,0)
+    time.sleep(1)
+
+setRGB(0,255,0)
+setText("Bye bye, this should wrap")
