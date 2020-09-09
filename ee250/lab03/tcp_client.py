@@ -7,13 +7,25 @@ Establish a socket connection -> send a short message -> get a message back -> t
 """
 import socket
 
+HOST = '3.129.247.87'  # The server's hostname or IP address
+PORT = 5000       # The port used by the server
+
 def main():
-    
-    # TODO: Create a socket and connect it to the server at the designated IP and port
-    
-    # TODO: Get user input and send it to the server using your TCP socket
-    
-    # TODO: Receive a response from the server and close the TCP connection
+
+	user_input = input("Enter a message ")
+	user_input = user_input.encode('UTF-8')
+
+	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+	    s.connect((HOST, PORT))
+	    s.sendall(user_input)
+	    data = s.recv(1024)
+	    data = data.decode('UTF-8')
+	print('Received', data)
 
 if __name__ == '__main__':
     main()
+
+import socket
+
+
+
