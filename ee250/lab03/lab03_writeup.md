@@ -65,8 +65,12 @@ The backlog argument defines the maximum length to which the queue of pending co
 Question 6
 
 while(1) creates an infinite loop that helps listen constantly for a message and read it into the buffer[256]
-If there are multiple simultaneous connections the code will read in one at a time and not be able to process simultaneous messages
+If there are multiple simultaneous connections the code will read in one at a time and not be able to process simultaneous connections. Hence, the handling will be slower
 
 Questions 7
 
-fork() can be used to fork off a new process to handle each new connection
+fork() can be used to fork off a new process to handle each new connection. This helps the handling become faster as the program can handle multiple connections simultaneously.
+
+Question 8
+
+A system call is the programmatic way in which a computer program requests a service from the kernel of the operating system it is executed on.

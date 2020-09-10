@@ -7,8 +7,9 @@ Establish a socket connection -> send a short message -> get a message back -> t
 """
 import socket
 
-HOST = '3.129.247.87'  # The server's hostname or IP address
-PORT = 5000       # The port used by the server
+#HOST = '3.129.247.87'  # Custom EC2 server IP address
+HOST = '34.209.114.30'   #professor's server IP address
+PORT = 5006       # The port used by the server
 
 def main():
 
@@ -17,10 +18,11 @@ def main():
 
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 	    s.connect((HOST, PORT))
+	    print("Connection succesful")
 	    s.sendall(user_input)
 	    data = s.recv(1024)
 	    data = data.decode('UTF-8')
-	print('Received', data)
+	print(data)
 
 if __name__ == '__main__':
     main()
