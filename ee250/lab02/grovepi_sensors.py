@@ -22,7 +22,7 @@ sys.path.append('../../Software/Python/')
 sys.path.append('../../Software/Python/grove_rgb_lcd')
 
 import grovepi
-#from grove_rgb_lcd import *
+from grove_rgb_lcd import *
 
 # This if-statement checks if you are running this python file directly. That 
 # is, if you run `python3 grovepi_sensors.py` in terminal, this if-statement will 
@@ -49,9 +49,9 @@ if __name__ == '__main__':
             #change_check = (abs(previous_sensor_value - sensor_value) > 2) or (abs(previous_ultrasonic_value - ultrasonic_value) > 2)
             print("sensor_value =", sensor_value)
             if(sensor_value >= ultrasonic_value ):
-                setText(str(sensor_value)+"cm OBJ PRES \n" + str(ultrasonic_value) + "cm" )
-            elif(sensor_value < ultrasonic_value )
-                setText(str(sensor_value)+"cm\n" + str(ultrasonic_value) + "cm" )
+                setText_norefresh("{}cm OBJ PRES \n{}cm".format(str(sensor_value),str(ultrasonic_value)))
+            elif(sensor_value < ultrasonic_value ):
+                setText_norefresh("{}cm\n{}cm".format(str(sensor_value),str(ultrasonic_value)))
             else:
                 continue
             previous_sensor_value = sensor_value
