@@ -49,8 +49,7 @@ if __name__ == '__main__':
             ultrasonic_value = grovepi.ultrasonicRead(PORT)
 
             change_check = (abs(previous_sensor_value - sensor_value) > 2) or (abs(previous_ultrasonic_value - ultrasonic_value) > 2)
-            
-            print("sensor_value =", sensor_value)
+
             if(sensor_value >= ultrasonic_value ):
                 if(above_threshold_check or change_check):
                     setText("{}cm OBJ PRES \n{}cm".format(str(sensor_value),str(ultrasonic_value)))
