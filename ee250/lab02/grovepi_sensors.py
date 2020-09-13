@@ -39,14 +39,31 @@ if __name__ == '__main__':
         print(grovepi.ultrasonicRead(PORT))
 '''
 from grove_rgb_lcd import *
+import grovepi
+import time
 
-setText("Hello world\nLCD test")
-setRGB(0,128,64)
+time.sleep(2)
+slide = 0
 
-# Slowly change the colors every 0.01 seconds.
-for c in range(0,255):
-    setRGB(c,255-c,0)
-    time.sleep(0.01)
+led = 1
 
+grovepi.pinMode(slide,"INPUT")
+grovepi.pinMode(led,"OUTPUT")
+time.sleep(1)
 setRGB(0,255,0)
-setText("Bye bye, this should wrap")
+setText(" ")
+previous_sensor_value = -1
+while True:
+	time.sleep(0.6)
+	try:
+		sensor_value = grovepi.analogRead(slide)
+		if sensor_value > 500:
+			grovepi.digitalWrite(led,1)
+		else:
+			grovepi.digitalWrite(led,0)
+		if (previous_sensor_value != sensor_value and abs(previous_sensor_value - sensor_value) > 2):
+			print("sensor_value =", sensor_value)
+			setText(str(sensor_value)+"cm")
+		previous_sensor_value = sensor_value
+	except IOError:
+		print("Error")
