@@ -31,6 +31,7 @@ if __name__ == '__main__':
     SLIDE = 0   #A0
     PORT = 4    # D4
     previous_sensor_value = -1
+    previous_ultrasonic_value = -1
 
     time.sleep(1)
     setRGB(0,255,0)
@@ -45,13 +46,14 @@ if __name__ == '__main__':
             sensor_value = grovepi.analogRead(SLIDE)
             ultrasonic_value = grovepi.ultrasonicRead(PORT)
 
-
-            if (previous_sensor_value != sensor_value and abs(previous_sensor_value - sensor_value) > 2):
-                print("sensor_value =", sensor_value)
-                if(sensor_value >= ultrasonic_value):
-                    setText(str(sensor_value)+"cm OBJ PRES \n" + str(ultrasonic_value) + "cm" )
-                else:
-                    setText(str(sensor_value)+"cm\n" + str(ultrasonic_value) + "cm" )
+            #change_check = (abs(previous_sensor_value - sensor_value) > 2) or (abs(previous_ultrasonic_value - ultrasonic_value) > 2)
+            print("sensor_value =", sensor_value)
+            if(sensor_value >= ultrasonic_value ):
+                setText(str(sensor_value)+"cm OBJ PRES \n" + str(ultrasonic_value) + "cm" )
+            elif(sensor_value < ultrasonic_value )
+                setText(str(sensor_value)+"cm\n" + str(ultrasonic_value) + "cm" )
+            else:
+                continue
             previous_sensor_value = sensor_value
         except IOError:
             print("Error")
