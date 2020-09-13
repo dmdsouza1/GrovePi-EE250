@@ -36,6 +36,8 @@ if __name__ == '__main__':
     time.sleep(1)
     setRGB(0,255,0)
     setText(" ")
+    above_threshold_check = False
+    below_threshold_check = False
 
     while True:
 
@@ -47,14 +49,26 @@ if __name__ == '__main__':
             ultrasonic_value = grovepi.ultrasonicRead(PORT)
 
             #change_check = (abs(previous_sensor_value - sensor_value) > 2) or (abs(previous_ultrasonic_value - ultrasonic_value) > 2)
+            
             print("sensor_value =", sensor_value)
             if(sensor_value >= ultrasonic_value ):
-                setText_norefresh("{}cm OBJ PRES \n{}cm".format(str(sensor_value),str(ultrasonic_value)))
+                if(above_threshold_check):
+                    setText("{}cm OBJ PRES \n{}cm".format(str(sensor_value),str(ultrasonic_value)))
+                    below_threshold_check = True
+                    above_threshold_check = False
+                else:
+                    setText_norefresh("{}cm OBJ PRES \n{}cm".format(str(sensor_value),str(ultrasonic_value)))
             elif(sensor_value < ultrasonic_value ):
-                setText_norefresh("{}cm\n{}cm".format(str(sensor_value),str(ultrasonic_value)))
+                if(below_threshold_check):
+                    setText("{}cm OBJ PRES \n{}cm".format(str(sensor_value),str(ultrasonic_value)))
+                    above_threshold_check = True
+                    below_threshold_check = False
+                else:
+                    setText_norefresh("{}cm\n{}cm".format(str(sensor_value),str(ultrasonic_value)))
             else:
                 continue
             previous_sensor_value = sensor_value
+            previous_ultrasonic_value = ultrasonic_value;
         except IOError:
             print("Error")
         
