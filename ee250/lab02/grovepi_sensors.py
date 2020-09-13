@@ -50,7 +50,7 @@ if __name__ == '__main__':
             ultrasonic_value = grovepi.ultrasonicRead(PORT)
 
             if(sensor_value >= ultrasonic_value ):
-                setRGB(0,128,64)            
+                setRGB(250,0,0)            
                 setText_norefresh("{}cm OBJ PRES \n{}cm".format(str(sensor_value),str(ultrasonic_value)))
 
             elif(sensor_value < ultrasonic_value ):
