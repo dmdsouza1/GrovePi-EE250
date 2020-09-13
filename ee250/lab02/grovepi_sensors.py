@@ -52,14 +52,14 @@ if __name__ == '__main__':
             
             print("sensor_value =", sensor_value)
             if(sensor_value >= ultrasonic_value ):
-                if(above_threshold_check and change_check):
+                if(above_threshold_check or change_check):
                     setText("{}cm OBJ PRES \n{}cm".format(str(sensor_value),str(ultrasonic_value)))
                     below_threshold_check = True
                     above_threshold_check = False
                 else:
                     setText_norefresh("{}cm OBJ PRES \n{}cm".format(str(sensor_value),str(ultrasonic_value)))
             elif(sensor_value < ultrasonic_value ):
-                if(below_threshold_check and change_check):
+                if(below_threshold_check or change_check):
                     setText("{}cm\n{}cm".format(str(sensor_value),str(ultrasonic_value)))
                     above_threshold_check = True
                     below_threshold_check = False
