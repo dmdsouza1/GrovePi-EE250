@@ -27,6 +27,7 @@ from grove_rgb_lcd import *
 # This if-statement checks if you are running this python file directly. That 
 # is, if you run `python3 grovepi_sensors.py` in terminal, this if-statement will 
 # be true
+'''
 if __name__ == '__main__':
     SLIDE = 0   #A0
     PORT = 4    # D4
@@ -71,4 +72,39 @@ if __name__ == '__main__':
         except IOError:
             print("Error")
         
+'''
 
+
+if __name__ == '__main__':
+    SLIDE = 0   #A0
+    PORT = 4    # D4
+    previous_sensor_value = -1
+    previous_ultrasonic_value = -1
+
+    time.sleep(1)
+    setRGB(0,255,0)
+    setText(" ")
+    above_threshold_check = False
+    below_threshold_check = False
+
+    while True:
+
+        #So we do not poll the sensors too quickly which may introduce noise,
+        #sleep for a reasonable time of 200ms between each iteration.
+        time.sleep(0.2)
+        try: 
+            sensor_value = grovepi.analogRead(SLIDE)
+            ultrasonic_value = grovepi.ultrasonicRead(PORT)
+
+            change_check = (abs(previous_sensor_value - sensor_value) > 2) or (abs(previous_ultrasonic_value - ultrasonic_value) > 2)
+
+            if(sensor_value >= ultrasonic_value ):
+                setText_norefresh("{}cm OBJ PRES \n{}cm".format(str(sensor_value),str(ultrasonic_value)))
+            elif(sensor_value < ultrasonic_value ):
+                setText_norefresh("{}cm          \n{}cm".format(str(sensor_value),str(ultrasonic_value)))
+            else:
+                continue
+            previous_sensor_value = sensor_value
+            previous_ultrasonic_value = ultrasonic_value;
+        except IOError:
+            print("Error")
