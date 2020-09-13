@@ -31,8 +31,6 @@ from grove_rgb_lcd import *
 if __name__ == '__main__':
     SLIDE = 0   # A0
     PORT = 4    # D4
-    previous_sensor_value = -1
-    previous_ultrasonic_value = -1
 
     time.sleep(1)
     setRGB(0,255,0)
