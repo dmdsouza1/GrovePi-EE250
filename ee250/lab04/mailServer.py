@@ -51,6 +51,7 @@ def get_mailbox_callback():
     # The object returned will be sent back as an HTTP message to the requester
     return response
 
+@app.route('/mailbox/search', methods=['GET'])
 # TODO: Use Flash's route() decorator to add support to your HTTP server for
 # handling GET requests made to the URL '/mailbox/search'
 #
@@ -61,7 +62,29 @@ def get_mailbox_callback():
 # Your implementation should handle reasonable error cases as well, such as an
 # incorrect password.
 
-#def search_mailbox_callback():
+def search_mailbox_callback():
+    password = request.args.get('password')
+
+    search_field = request.args.get('field')
+    search_text = request.args.get('text')
+
+   
+    if password == mailbox_password:
+        # Use Flask's jsonify function to format the dictionary as JSON
+        if search_field is not None and search_text is not None:
+            response = jsonify(mailbox_manager.get_mail(None, search_text))
+        else:
+            response = jsonify(mailbox_manager.get_mail(None, search_text))
+
+    else:
+        if password == None:
+            response = jsonify({'Response': 'Missing password'})
+
+        else:
+            response = jsonify({'Response': 'Password does not match'})
+
+    # The object returned will be sent back as an HTTP message to the requester
+    return response
 
 
 @app.route('/mailbox/delete', methods=['DELETE'])

@@ -111,7 +111,10 @@ class mailboxManager(object):
 
         response = []
         for mail in self.mailbox:
-            assert search_field is None or search_field in mail.keys()
+            try:
+                assert search_field is None or search_field in mail.keys()
+            except AssertionError:
+                print("An attempt was made lol")
 
             # if a search field and search text is provided, only look for the
             # text in the field provided
