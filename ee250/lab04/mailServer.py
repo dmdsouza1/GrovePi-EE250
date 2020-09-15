@@ -71,8 +71,11 @@ def search_mailbox_callback():
    
     if password == mailbox_password:
         # Use Flask's jsonify function to format the dictionary as JSON
-        if search_field is not None and search_text is not None:
-            response = jsonify(mailbox_manager.get_mail(None, search_text))
+        # if search_field is not None and search_text is not None:
+        #     response = jsonify(mailbox_manager.get_mail(None, search_text))
+        # else:
+        if search_field is not None and search_text is None:
+            response = jsonify({'Response': 'Missing text'})
         else:
             response = jsonify(mailbox_manager.get_mail(search_field, search_text))
 

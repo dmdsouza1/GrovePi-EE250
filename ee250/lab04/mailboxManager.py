@@ -21,15 +21,17 @@ class mailboxManager(object):
             with open(MAIL_DB_FILE, 'rb') as f:
                 print('Loading {}'.format(MAIL_DB_FILE))
                 # TODO: load the pickle data into self.mailbox
-                while True:
-                    try:
-                        self.mailbox.append(pickle.load(f))
-                    except EOFError:
-                        break
+                # while True:
+                #     try:
+                #         self.mailbox.append(pickle.load(f))
+                #     except EOFError:
+                #         break
+                self.mailbox = pickle.loads(f.read())
                 f.close()
 
         except FileNotFoundError:
-            pass
+            outfile = open(MAIL_DB_FILE,'wb')    
+            outfile.close()
 
     def _mail_format_valid(self, mail_entry):
         """
@@ -119,10 +121,8 @@ class mailboxManager(object):
 
         response = []
         for mail in self.mailbox:
-            try:
-                assert search_field is None or search_field in mail.keys()
-            except AssertionError:
-                print("An attempt was made lol")
+            assert search_field is None or search_field in mail.keys()
+            
 
             # if a search field and search text is provided, only look for the
             # text in the field provided
