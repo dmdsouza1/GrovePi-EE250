@@ -74,7 +74,7 @@ def search_mailbox_callback():
         if search_field is not None and search_text is not None:
             response = jsonify(mailbox_manager.get_mail(None, search_text))
         else:
-            response = jsonify(mailbox_manager.get_mail(None, search_text))
+            response = jsonify(mailbox_manager.get_mail(search_field, search_text))
 
     else:
         if password == None:
