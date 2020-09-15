@@ -9,11 +9,7 @@ notes = []
 
 try:
 	infile = open('notes.pickle','rb')
-	while True:
-		try:
-			notes.append(pickle.load(infile))
-		except EOFError:
-			break
+	notes = pickle.loads(infile.read())
 
 except FileNotFoundError:
 
@@ -21,22 +17,23 @@ except FileNotFoundError:
 	
 	outfile.close()
 
-print(type(notes))
+# B. Print out notes
 print(notes)
 
 
+# C. Read in a string from the user using input() and append it to notes
 
 s = input("Enter something to append to notes ")
 
+# D. Save notes to notes.pickle
 outfile = open('notes.pickle','a+b')
 pickle.dump(s, outfile)
 outfile.close()
 
 
 
-# B. Print out notes
 
-# C. Read in a string from the user using input() and append it to notes
 
-# D. Save notes to notes.pickle
+
+
 

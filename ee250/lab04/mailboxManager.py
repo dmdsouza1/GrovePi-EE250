@@ -21,11 +21,7 @@ class mailboxManager(object):
             with open(MAIL_DB_FILE, 'rb') as f:
                 print('Loading {}'.format(MAIL_DB_FILE))
                 # TODO: load the pickle data into self.mailbox
-                # while True:
-                #     try:
-                #         self.mailbox.append(pickle.load(f))
-                #     except EOFError:
-                #         break
+                
                 self.mailbox = pickle.loads(f.read())
                 f.close()
 
