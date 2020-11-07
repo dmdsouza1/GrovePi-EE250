@@ -32,11 +32,11 @@ while True:
         
         if (resistance < threshold):
             pass
-            
-        time.sleep(0.1)
         
         sensor_value = grovepi.analogRead(LIGHT_SENSOR)
         resistance = (float)(1023 - sensor_value) * 10 / sensor_value
+        if(resistance == 0):
+            resistance += 1
         time.sleep(0.1)
         print("light sensor value", sensor_value)
         print("ultrasonic value", ultrasonic_value)
