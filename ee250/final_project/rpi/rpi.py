@@ -4,24 +4,57 @@ import time
 
 sys.path.append('/home/pi/Dexter/GrovePi/Software/Python')
 
+import grovepi
+import grove_rgb_lcd as lcd
+
+# Modules for my apps
+import my_reddit
+import my_weather
+import my_space_station
+#import my_app  # TODO: Create my_app.py using another API, following the examples as a template
+
+ULTRASONIC_PORT = 4     # D4
+LIGHT_SENSOR = 1    #A1
+
+threshold = 10
+resistance = 0
+sensor_value = 1
 
 
-import math
 
-from grovepi import *
-from grove_oled import *
+# Setup
+grovepi.pinMode(ULTRASONIC_PORT, "INPUT")
+grovepi.pinMode(LIGHT_SENSOR,"INPUT")
 
-dht_sensor_port = 4     # Connect the DHt sensor to port 7
-
-time.sleep(.1)
-
+time.sleep(1)
 while True:
     try:
+        time.sleep(0.2)
+        # sensor_value = grovepi.analogRead(LIGHT_SENSOR)
         
-        time.sleep(0.5)
-        [temp,hum] = dht(dht_sensor_port,0)       #Get the temperature and Humidity from the DHT sensor
+        ultrasonic_value = grovepi.ultrasonicRead(PORT)
+         
+        time.sleep(0.1)     
+        
+        if (resistance < threshold):
+            pass
+            
+        time.sleep(0.1)
+        
+        sensor_value = grovepi.analogRead(LIGHT_SENSOR)
+        resistance = (float)(1023 - sensor_value) * 10 / sensor_value
+        time.sleep(0.1)
+        print("light sensor value", resistance)
+        print("ultrasonic value", ultrasonic_value)
 
-        print("temp =", temp, "C\thumidity =", hum,"%") 
-        time.sleep(1)   
-    except (IOError,TypeError) as e:
-        print("Error")
+    except KeyboardInterrupt:
+        break
+
+    except IOError:
+            print ("Error")
+
+    except ZeroDivisionError:
+            pass
+
+
+
