@@ -17,9 +17,9 @@ time.sleep(.1)
 
 while True:
     try:
-        dht(dht_sensor_port,0)
+        
         time.sleep(0.5)
-        [temp,hum] = dht(dht_sensor_port,1)       #Get the temperature and Humidity from the DHT sensor
+        [temp,hum] = dht(dht_sensor_port,0)       #Get the temperature and Humidity from the DHT sensor
 
         print("temp =", temp, "C\thumidity =", hum,"%") 
         time.sleep(1)   
