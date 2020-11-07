@@ -49,7 +49,7 @@ dht_sensor_type = 0 # use 0 for the blue-colored sensor and 1 for the white-colo
 # we need to do it just once
 # setting the backlight color once reduces the amount of data transfer over the I2C line
 setRGB(0,255,0)
-
+print("started")
 while True:
 	try:
         # get the temperature and Humidity from the DHT sensor
