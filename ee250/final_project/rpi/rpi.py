@@ -23,7 +23,7 @@ while True:
         time.sleep(1)
         [ temp,hum ] = dht(dht_sensor_port,1)       #Get the temperature and Humidity from the DHT sensor
         if math.isnan(temp) or  math.isnan(humidity):
-            [temp,humidity] = dht(sensor,0)
+            [temp,humidity] = dht(dht_sensor_port,0)
             print('temperature ',temp, 'humidity ',humidity)
 
         time.sleep(.5)
