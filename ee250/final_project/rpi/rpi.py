@@ -19,7 +19,7 @@ while True:
     try:
         time.sleep(1)
         print("henlo")
-        dht(dht_sensor_port,0)
+        # dht(dht_sensor_port,0)
         time.sleep(1)
         [ temp,hum ] = dht(dht_sensor_port,1)       #Get the temperature and Humidity from the DHT sensor
         if math.isnan(temp) or  math.isnan(humidity):
