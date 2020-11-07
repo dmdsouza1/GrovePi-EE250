@@ -51,7 +51,7 @@ dht_sensor_type = 0 # use 0 for the blue-colored sensor and 1 for the white-colo
 setRGB(0,255,0)
 print("started")
 setText_norefresh("hello")
-setText_norefresh("")
+
 while True:
 	try:
 		print("entered try")
