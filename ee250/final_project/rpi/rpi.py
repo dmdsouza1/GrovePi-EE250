@@ -22,7 +22,11 @@ while True:
         dht(dht_sensor_port,0)
         time.sleep(1)
         [ temp,hum ] = dht(dht_sensor_port,1)       #Get the temperature and Humidity from the DHT sensor
+        if math.isnan(temp) or  math.isnan(humidity):
+            [temp,humidity] = grovepi.dht(sensor,0)
+            print('temperature ',temp, 'humidity ',humidity)
 
+        time.sleep(.5)
         print("temp =", temp, "C\thumidity =", hum,"%") 
         time.sleep(1)   
     except (IOError,TypeError) as e:
