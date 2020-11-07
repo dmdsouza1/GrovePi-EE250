@@ -23,7 +23,9 @@ while True:
     try:
         # This example uses the blue colored sensor. 
         # The first parameter is the port, the second parameter is the type of sensor.
+        print("stuck at dht")
         [temp,humidity] = grovepi.dht(sensor,blue)  
+        print("still stuck at dht")
         if math.isnan(temp) == False and math.isnan(humidity) == False:
             print("temp = %.02f C humidity =%.02f%%"%(temp, humidity))
         else:
