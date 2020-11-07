@@ -52,8 +52,8 @@ setRGB(0,255,0)
 print("started")
 while True:
 	try:
-        # get the temperature and Humidity from the DHT sensor
-                print("entered try")
+		print("entered try")
+        # get the temperature and Humidity from the DHT sensor        
 		[ temp,hum ] = dht(dht_sensor_port,dht_sensor_type)
 		print("temp =", temp, "C\thumidity =", hum,"%")
 
