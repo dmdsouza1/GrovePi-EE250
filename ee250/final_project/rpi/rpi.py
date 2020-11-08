@@ -10,10 +10,10 @@ import grove_rgb_lcd as lcd
 ULTRASONIC_PORT = 4     # D4
 LIGHT_SENSOR = 1    #A1
 
-threshold = 10
+threshold = 100
 resistance = 0
 sensor_value = 1
-
+LIGHT_STATUS = "off"
 
 
 # Setup
@@ -38,7 +38,12 @@ while True:
         if(resistance == 0):
             resistance += 1
         time.sleep(0.1)
-        print("light sensor value", sensor_value)
+        if(resistance > threshold):
+            print("light off")
+            LIGHT_STATUS = "off"
+        else:
+            print("light on")
+            LIGHT_STATUS = "on"
         print("ultrasonic value", ultrasonic_value)
 
     except KeyboardInterrupt:
