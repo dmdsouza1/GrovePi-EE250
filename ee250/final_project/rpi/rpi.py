@@ -12,7 +12,7 @@ ULTRASONIC_PORT = 4     # D4
 LIGHT_SENSOR = 1    #A1
 
 light_threshold = 100
-ultrasonic_threshold = 
+ultrasonic_threshold = 20
 resistance = 0
 sensor_value = 1
 LIGHT_STATUS = "off"
@@ -27,29 +27,34 @@ higher_weight_index = 1
 grovepi.pinMode(ULTRASONIC_PORT, "INPUT")
 grovepi.pinMode(LIGHT_SENSOR,"INPUT")
 #getting initial values for the windows
-ultrasonic_sensor_window[0] = grovepi.ultrasonicRead(ULTRASONIC_PORT)  
-time.sleep(0.1)
-light_sensor_window[0] = sensor_value = grovepi.analogRead(LIGHT_SENSOR)
-time.sleep(0.1)
-ultrasonic_sensor_window[1] = grovepi.ultrasonicRead(ULTRASONIC_PORT)  
-time.sleep(0.1)
-light_sensor_window[1] = sensor_value = grovepi.analogRead(LIGHT_SENSOR)
-time.sleep(0.1)
-ultrasonic_sensor_window[2] = grovepi.ultrasonicRead(ULTRASONIC_PORT)  
-time.sleep(0.1)
-light_sensor_window[2] = sensor_value = grovepi.analogRead(LIGHT_SENSOR)
-time.sleep(0.1)
 time.sleep(0.5)
+print("hello")
+'''
+ultrasonic_sensor_window[0] = grovepi.ultrasonicRead(ULTRASONIC_PORT)  
+time.sleep(0.2)
+light_sensor_window[0] = sensor_value = grovepi.analogRead(LIGHT_SENSOR)
+time.sleep(0.2)
+ultrasonic_sensor_window[1] = grovepi.ultrasonicRead(ULTRASONIC_PORT)  
+time.sleep(0.2)
+light_sensor_window[1] = sensor_value = grovepi.analogRead(LIGHT_SENSOR)
+time.sleep(0.2)
+ultrasonic_sensor_window[2] = grovepi.ultrasonicRead(ULTRASONIC_PORT)  
+time.sleep(0.2)
+light_sensor_window[2] = sensor_value = grovepi.analogRead(LIGHT_SENSOR)
+time.sleep(0.2)
+time.sleep(0.5)
+'''
+print("entering while")
 while True:
     try:
+        print("in try")
         if(index == 3):
             index = 0
-        if(higher_weight_index = 3):
+        if(higher_weight_index == 3):
             higher_weight_index = 0
+        print("before read sensor")
         ultrasonic_sensor_window[index] = grovepi.ultrasonicRead(ULTRASONIC_PORT)
-         
-        time.sleep(0.1)     
-        
+        time.sleep(1)
         sensor_value = grovepi.analogRead(LIGHT_SENSOR)
         if(sensor_value == 0):
             sensor_value = 1
@@ -75,6 +80,9 @@ while True:
         print("weighted sensor value", weighted_sensor_value)
         index += 1
         higher_weight_index += 1
+        weighted_sensor_value = 0
+        weighted_ultrasonic_value = 0
+        time.sleep(1)
 
     except KeyboardInterrupt:
         break
