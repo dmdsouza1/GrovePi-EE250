@@ -69,7 +69,7 @@ def influx_thread(name):
 
 
 def grovepi_thread():
-     ULTRASONIC_PORT = 4     # D4
+    ULTRASONIC_PORT = 4     # D4
     LIGHT_SENSOR = 1    #A1
 
     light_threshold = 100
