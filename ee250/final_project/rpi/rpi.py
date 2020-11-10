@@ -14,7 +14,7 @@ import grovepi
 LIGHT_STATUS = "off"
 hostname = "dmdsouza"
 lock = threading.Lock()
-
+end_thread = False
 # def on_connect(client, userdata, flags, rc):
 #     print("Connected to server (i.e., broker) with result code "+str(rc))
     # client.subscribe(hostname + "/led")
@@ -39,33 +39,39 @@ lock = threading.Lock()
 #             time.sleep(0.2)
 light_status_number = 0
 def influx_thread(name):
-    while True:        
-        with lock:
-            if(LIGHT_STATUS == "off"):
-                light_status_number = 0
-            else:
-                light_status_number = 1
+    if end_thread:
+        break
 
-    
+    while True:  
+        try:      
+            with lock:
+                if(LIGHT_STATUS == "off"):
+                    light_status_number = 0
+                else:
+                    light_status_number = 1
+
+        
 
 
-        timeStr = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            timeStr = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        print("The light status number before write is", light_status_number)
-        json_body = [
-                {
-                    "measurement": "light",            
-                    "time": timeStr,
-                    "fields": {                
-                        "light_status": light_status_number
+            print("The light status number before write is", light_status_number)
+            json_body = [
+                    {
+                        "measurement": "light",            
+                        "time": timeStr,
+                        "fields": {                
+                            "light_status": light_status_number
+                        }
                     }
-                }
-            ]
+                ]
 
-        client = InfluxDBClient(host = 'daniel-HP-Notebook', port = 8086, username = 'admin', password = 'password', database = 'test_light', ssl = True)
-        client.write_points(json_body)
-        print("the light status number after write is", light_status_number)
-        time.sleep(10)
+            client = InfluxDBClient(host = 'daniel-HP-Notebook', port = 8086, username = 'admin', password = 'password', database = 'test_light', ssl = True)
+            client.write_points(json_body)
+            print("the light status number after write is", light_status_number)
+            time.sleep(10)
+        except KeyboardInterrupt:
+            break
 
 
 
@@ -92,6 +98,8 @@ def grovepi_thread(name):
     time.sleep(0.5)
     print("hello")
     while True:
+        if end_thread:
+            break
         try:
             if(index == 3):
                 index = 0
@@ -153,8 +161,7 @@ if __name__ == '__main__':
             time.sleep(4)
         except KeyboardInterrupt:
             print("killing the threads")
-            influx.kill()
-            grovepi_threading.kill()
+            end_thread = True
             break
    
 
