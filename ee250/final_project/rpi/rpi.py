@@ -51,7 +51,7 @@ def influx_thread(name):
 
         timeStr = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-
+        print("The light status number before write is", light_status_number)
         json_body = [
                 {
                     "measurement": "light",            
@@ -63,7 +63,8 @@ def influx_thread(name):
             ]
 
         client = InfluxDBClient(host = 'daniel-HP-Notebook', port = 8086, username = 'admin', password = 'password', database = 'test_light', ssl = True)
-        result=client.write_points(json_body)
+        client.write_points(json_body)
+        print("the light status number after write is", light_status_number)
         time.sleep(10)
 
 
