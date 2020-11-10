@@ -11,12 +11,13 @@ import time
 sys.path.append('/home/pi/Dexter/GrovePi/Software/Python')
 
 import grovepi
-
+from grovepi import *
 LIGHT_STATUS = 0
 hostname = "dmdsouza"
 lock = threading.Lock()
 end_thread = False
 q = queue.Queue()
+control_light_queue = queue.Queue()
 def on_connect(client, userdata, flags, rc):
     print("Connected to server (i.e., broker) with result code "+str(rc))
     client.subscribe(hostname + "/led")
@@ -26,16 +27,18 @@ def led_callback(client, userdata, message):
     message_recv = str(message.payload, "utf-8")
     if(message_recv == "LED_ON"):
         try:
-            digitalWrite(LED_PORT,1)     # Send HIGH to switch on LED
+            # digitalWrite(LED_PORT,1)     # Send HIGH to switch on LED
             print ("LED ON!")
+            control_light_queue.put(1)
             time.sleep(0.2)
         except:             # Handles errors
             time.sleep(0.2)                             
 
     elif(message_recv == "LED_OFF"):
         try:
-            digitalWrite(LED_PORT,0)     # Send LOW to switch off LED
+            # digitalWrite(LED_PORT,0)     # Send LOW to switch off LED
             print ("LED OFF!")
+            control_light_queue.put(0)
             time.sleep(0.2)
         except:             # Handles errors
             time.sleep(0.2)
@@ -118,6 +121,10 @@ time.sleep(0.5)
 
 while True:
     try:
+        item = control_light_queue.get()
+        digitalWrite(LED_PORT,item)
+        time.sleep(0.2)
+        control_light_queue.task_done()
         if(index == 3):
             index = 0
         if(higher_weight_index == 3):
