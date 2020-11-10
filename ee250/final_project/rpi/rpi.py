@@ -39,15 +39,18 @@ end_thread = False
 #             time.sleep(0.2)
 light_status_number = 0
 def influx_thread(name):
-    if end_thread:
-        break
 
-    while True:  
+    while True:
+        if end_thread:
+            break 
         try:      
             with lock:
+                print("inside lock in influx")
                 if(LIGHT_STATUS == "off"):
+                    print("turning off influx")
                     light_status_number = 0
                 else:
+                    print("turning on influx")
                     light_status_number = 1
 
         
