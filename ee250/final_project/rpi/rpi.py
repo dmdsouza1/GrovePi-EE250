@@ -17,28 +17,32 @@ hostname = "dmdsouza"
 lock = threading.Lock()
 end_thread = False
 q = queue.Queue()
-# def on_connect(client, userdata, flags, rc):
-#     print("Connected to server (i.e., broker) with result code "+str(rc))
-    # client.subscribe(hostname + "/led")
-    # client.subscribe(hostname + "/lcd")
-    # client.message_callback_add(hostname + "/led", led_callback)  #custom callback for topic led
-    # client.message_callback_add(hostname + "/lcd", lcd_callback)  #custom callback for topic lcd
+def on_connect(client, userdata, flags, rc):
+    print("Connected to server (i.e., broker) with result code "+str(rc))
+    client.subscribe(hostname + "/led")
+    client.message_callback_add(hostname + "/led", led_callback)  #custom callback for topic led
+    
+def led_callback(client, userdata, message):
+    message_recv = str(message.payload, "utf-8")
+    if(message_recv == "LED_ON"):
+        try:
+            digitalWrite(LED_PORT,1)     # Send HIGH to switch on LED
+            print ("LED ON!")
+            time.sleep(0.2)
+        except:             # Handles errors
+            time.sleep(0.2)                             
 
-# def lcd_callback(client, userdata, message):
-#     message_recv = str(message.payload, "utf-8")
-#     #displaying w a s d according 
-#     if(message_recv in lcd_list):
-#         try:
-#             if(message_recv == "w"):
-#                 setText_norefresh("{}\n".format("w"))
-#             elif(message_recv == "a"):
-#                 setText_norefresh("{}\n".format("a"))
-#             elif(message_recv == "s"):
-#                 setText_norefresh("{}\n".format("s"))
-#             elif(message_recv == "d"):
-#                 setText_norefresh("{}\n".format("d"))
-#         except:
-#             time.sleep(0.2)
+    elif(message_recv == "LED_OFF"):
+        try:
+            digitalWrite(LED_PORT,0)     # Send LOW to switch off LED
+            print ("LED OFF!")
+            time.sleep(0.2)
+        except:             # Handles errors
+            time.sleep(0.2)
+
+def on_message(client, userdata, msg):
+    print("on_message: " + msg.topic + " " + str(msg.payload, "utf-8"))
+
 light_status_number = 0
 def influx_thread(name):
 
@@ -78,17 +82,18 @@ def influx_thread(name):
 
 
 
-# client = mqtt.Client()
-# client.on_message = on_message
-# client.on_connect = on_connect
-# client.connect(host="eclipse.usc.edu", port=11000, keepalive=60)
-# client.loop_start()
+client = mqtt.Client()
+client.on_message = on_message
+client.on_connect = on_connect
+client.connect(host="eclipse.usc.edu", port=11000, keepalive=60)
+client.loop_start()
 influx = threading.Thread(target = influx_thread, daemon = True, args=(1,))
 influx.start()
 # grovepi_threading =threading.Thread(target = grovepi_thread, args=(1,))
 # grovepi_threading.start()
 ULTRASONIC_PORT = 4     # D4
 LIGHT_SENSOR = 1    #A1
+LED_PORT = 2 # D2
 
 light_threshold = 100
 ultrasonic_threshold = 20
@@ -105,6 +110,9 @@ higher_weight_index = 1
 # Setup
 grovepi.pinMode(ULTRASONIC_PORT, "INPUT")
 grovepi.pinMode(LIGHT_SENSOR,"INPUT")
+grovepi.pinMode(LED_PORT,"OUTPUT")
+# turning on the light initially
+digitalWrite(LED_PORT,1)
 #getting initial values for the windows
 time.sleep(0.5)
 
@@ -143,7 +151,10 @@ while True:
         weighted_ultrasonic_value = 0
         time.sleep(1)
 
-    except KeyboardInterrupt:   
+    except KeyboardInterrupt: 
+        # Turning off the led before you exit
+        digitalWrite(LED_PORT,0)  
+        time.sleep(0.3)
         q.join()
         end_thread = True     
         break
