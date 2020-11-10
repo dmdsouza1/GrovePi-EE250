@@ -44,14 +44,14 @@ def influx_thread(name):
         if end_thread:
             break 
         try:      
-            with lock:
-                print("inside lock in influx")
-                if(LIGHT_STATUS == 0):
-                    print("turning off influx")
-                    light_status_number = 0
-                else:
-                    print("turning on influx")
-                    light_status_number = 1
+            
+            print("inside lock in influx")
+            if(LIGHT_STATUS == 0):
+                print("turning off influx")
+                light_status_number = 0
+            else:
+                print("turning on influx")
+                light_status_number = 1
 
         
 
@@ -125,13 +125,12 @@ def grovepi_thread(name):
 
             print("weighted ultrasonic value", ultrasonic_sensor_value)
             print("weighted sensor value", weighted_sensor_value)
-            with lock:
-                if(weighted_sensor_value < light_threshold):
-                    LIGHT_STATUS = 1
-                    print("changed status to on")
-                else:
-                    LIGHT_STATUS = 0
-                    print("changed status to off")
+            if(weighted_sensor_value < light_threshold):
+                LIGHT_STATUS = 1
+                print("changed status to on")
+            else:
+                LIGHT_STATUS = 0
+                print("changed status to off")
             index += 1
             higher_weight_index += 1
             weighted_sensor_value = 0
