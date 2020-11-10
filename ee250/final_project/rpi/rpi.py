@@ -132,10 +132,10 @@ while True:
         print("weighted ultrasonic value", ultrasonic_sensor_value)
         print("weighted sensor value", weighted_sensor_value)
         if(weighted_sensor_value < light_threshold):
-            q.put(0)
+            q.put(1)
             print("changed status to on")
         else:
-            q.put(1)
+            q.put(0)
             print("changed status to off")
         index += 1
         higher_weight_index += 1
