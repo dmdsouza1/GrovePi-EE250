@@ -11,7 +11,7 @@ sys.path.append('/home/pi/Dexter/GrovePi/Software/Python')
 
 import grovepi
 
-LIGHT_STATUS = "off"
+LIGHT_STATUS = 0
 hostname = "dmdsouza"
 lock = threading.Lock()
 end_thread = False
@@ -46,7 +46,7 @@ def influx_thread(name):
         try:      
             with lock:
                 print("inside lock in influx")
-                if(LIGHT_STATUS == "off"):
+                if(LIGHT_STATUS == 0):
                     print("turning off influx")
                     light_status_number = 0
                 else:
@@ -127,10 +127,10 @@ def grovepi_thread(name):
             print("weighted sensor value", weighted_sensor_value)
             with lock:
                 if(weighted_sensor_value < light_threshold):
-                    LIGHT_STATUS = "on"
+                    LIGHT_STATUS = 1
                     print("changed status to on")
                 else:
-                    LIGHT_STATUS = "off"
+                    LIGHT_STATUS = 0
                     print("changed status to off")
             index += 1
             higher_weight_index += 1
