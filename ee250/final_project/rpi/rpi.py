@@ -146,7 +146,13 @@ if __name__ == '__main__':
     grovepi_threading =threading.Thread(target = grovepi_thread, args=(1,))
     grovepi_threading.start()
     while True:
-        time.sleep(4)
+        try:
+            time.sleep(4)
+        except KeyboardInterrupt:
+            print("killing the threads")
+            influx.kill()
+            grovepi_threading.kill()
+            break
    
 
 
