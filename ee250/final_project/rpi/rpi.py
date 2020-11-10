@@ -37,9 +37,9 @@ lock = threading.Lock()
 #                 setText_norefresh("{}\n".format("d"))
 #         except:
 #             time.sleep(0.2)
+light_status_number = 0
 def influx_thread(name):
-    while True:
-        light_status_number = 0        
+    while True:        
         with lock:
             if(LIGHT_STATUS == "off"):
                 light_status_number = 0
@@ -114,10 +114,12 @@ def grovepi_thread(name):
             print("weighted ultrasonic value", ultrasonic_sensor_value)
             print("weighted sensor value", weighted_sensor_value)
             with lock:
-                if(weighted_sensor_value > light_threshold):
+                if(weighted_sensor_value < light_threshold):
                     LIGHT_STATUS = "on"
+                    print("changed status to on")
                 else:
                     LIGHT_STATUS = "off"
+                    print("changed status to off")
             index += 1
             higher_weight_index += 1
             weighted_sensor_value = 0
