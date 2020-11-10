@@ -68,7 +68,7 @@ def influx_thread(name):
 
 
 
-def grovepi_thread():
+def grovepi_thread(name):
     ULTRASONIC_PORT = 4     # D4
     LIGHT_SENSOR = 1    #A1
 
@@ -89,7 +89,7 @@ def grovepi_thread():
     grovepi.pinMode(LIGHT_SENSOR,"INPUT")
     #getting initial values for the windows
     time.sleep(0.5)
-
+    print("hello")
     while True:
         try:
             if(index == 3):
@@ -141,9 +141,9 @@ if __name__ == '__main__':
     # client.on_connect = on_connect
     # client.connect(host="eclipse.usc.edu", port=11000, keepalive=60)
     # client.loop_start()
-    influx = threading.Thread(target = influx_thread,arg=(1,))
+    influx = threading.Thread(target = influx_thread,args=(1,))
     influx.start()
-    grovepi_threading =threading.Thread(target = grovepi_thread, arg=(1,))
+    grovepi_threading =threading.Thread(target = grovepi_thread, args=(1,))
     grovepi_threading.start()
     while True:
         time.sleep(4)
