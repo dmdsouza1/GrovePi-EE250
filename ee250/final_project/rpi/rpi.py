@@ -2,6 +2,7 @@ import sys
 
 import paho.mqtt.client as mqtt
 import threading
+import queue
 
 from influxdb import InfluxDBClient
 from datetime import datetime
@@ -15,6 +16,7 @@ LIGHT_STATUS = 0
 hostname = "dmdsouza"
 lock = threading.Lock()
 end_thread = False
+q = queue.Queue()
 # def on_connect(client, userdata, flags, rc):
 #     print("Connected to server (i.e., broker) with result code "+str(rc))
     # client.subscribe(hostname + "/led")
@@ -43,17 +45,13 @@ def influx_thread(name):
     while True:
         if end_thread:
             break 
-        try:      
-            
-            print("inside lock in influx")
-            if(LIGHT_STATUS == 0):
-                print("turning off influx")
-                light_status_number = 0
-            else:
-                print("turning on influx")
-                light_status_number = 1
-
-        
+        try:  
+            if q.empty():
+                continue    
+            light_status_number = q.get()   
+            while q.empty() != True:
+                light_status_number = q.get()
+                q.task_done()
 
 
             timeStr = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -73,99 +71,89 @@ def influx_thread(name):
             client.write_points(json_body)
             print("the light status number after write is", light_status_number)
             time.sleep(10)
+            q.task_done()
         except KeyboardInterrupt:
             break
 
 
 
-def grovepi_thread(name):
-    ULTRASONIC_PORT = 4     # D4
-    LIGHT_SENSOR = 1    #A1
 
-    light_threshold = 100
-    ultrasonic_threshold = 20
-    resistance = 0
-    sensor_value = 1
-    
-    NUMBER_OF_PEOPLE_IN_ROOM = 0
-    light_sensor_window = [0,0,0]
-    # ultrasonic_sensor_window = [0,0,0]
-    weighted_sensor_value = 0.0
-    # weighted_ultrasonic_value = 0.0
-    index = 0
-    higher_weight_index = 1
-    # Setup
-    grovepi.pinMode(ULTRASONIC_PORT, "INPUT")
-    grovepi.pinMode(LIGHT_SENSOR,"INPUT")
-    #getting initial values for the windows
-    time.sleep(0.5)
-    print("hello")
-    while True:
-        if end_thread:
-            break
-        try:
-            if(index == 3):
-                index = 0
-            if(higher_weight_index == 3):
-                higher_weight_index = 0
-            ultrasonic_sensor_value = grovepi.ultrasonicRead(ULTRASONIC_PORT)
-            time.sleep(0.2)
-            sensor_value = grovepi.analogRead(LIGHT_SENSOR)
-            if(sensor_value == 0):
-                sensor_value = 1
-            resistance = (float)(1023 - sensor_value) * 10 / sensor_value
-            light_sensor_window[index] = resistance
-            for i in range(3):
-                if(i == higher_weight_index):
-                    # weighted_ultrasonic_value += ultrasonic_sensor_window[i] * 0.5
-                    weighted_sensor_value += light_sensor_window[i] * 0.5
-                else:
-                    # weighted_ultrasonic_value += ultrasonic_sensor_window[i] * 0.25
-                    weighted_sensor_value += light_sensor_window[i] * 0.25
+# client = mqtt.Client()
+# client.on_message = on_message
+# client.on_connect = on_connect
+# client.connect(host="eclipse.usc.edu", port=11000, keepalive=60)
+# client.loop_start()
+influx = threading.Thread(target = influx_thread, daemon = True, args=(1,))
+influx.start()
+# grovepi_threading =threading.Thread(target = grovepi_thread, args=(1,))
+# grovepi_threading.start()
+ULTRASONIC_PORT = 4     # D4
+LIGHT_SENSOR = 1    #A1
 
-            print("weighted ultrasonic value", ultrasonic_sensor_value)
-            print("weighted sensor value", weighted_sensor_value)
-            if(weighted_sensor_value < light_threshold):
-                LIGHT_STATUS = 1
-                print("changed status to on")
+light_threshold = 100
+ultrasonic_threshold = 20
+resistance = 0
+sensor_value = 1
+
+NUMBER_OF_PEOPLE_IN_ROOM = 0
+light_sensor_window = [0,0,0]
+# ultrasonic_sensor_window = [0,0,0]
+weighted_sensor_value = 0.0
+# weighted_ultrasonic_value = 0.0
+index = 0
+higher_weight_index = 1
+# Setup
+grovepi.pinMode(ULTRASONIC_PORT, "INPUT")
+grovepi.pinMode(LIGHT_SENSOR,"INPUT")
+#getting initial values for the windows
+time.sleep(0.5)
+
+while True:
+    try:
+        if(index == 3):
+            index = 0
+        if(higher_weight_index == 3):
+            higher_weight_index = 0
+        ultrasonic_sensor_value = grovepi.ultrasonicRead(ULTRASONIC_PORT)
+        time.sleep(0.2)
+        sensor_value = grovepi.analogRead(LIGHT_SENSOR)
+        if(sensor_value == 0):
+            sensor_value = 1
+        resistance = (float)(1023 - sensor_value) * 10 / sensor_value
+        light_sensor_window[index] = resistance
+        for i in range(3):
+            if(i == higher_weight_index):
+                # weighted_ultrasonic_value += ultrasonic_sensor_window[i] * 0.5
+                weighted_sensor_value += light_sensor_window[i] * 0.5
             else:
-                LIGHT_STATUS = 0
-                print("changed status to off")
-            index += 1
-            higher_weight_index += 1
-            weighted_sensor_value = 0
-            weighted_ultrasonic_value = 0
-            time.sleep(1)
+                # weighted_ultrasonic_value += ultrasonic_sensor_window[i] * 0.25
+                weighted_sensor_value += light_sensor_window[i] * 0.25
 
-        except KeyboardInterrupt:
-            break
+        print("weighted ultrasonic value", ultrasonic_sensor_value)
+        print("weighted sensor value", weighted_sensor_value)
+        if(weighted_sensor_value < light_threshold):
+            q.put(0)
+            print("changed status to on")
+        else:
+            q.put(1)
+            print("changed status to off")
+        index += 1
+        higher_weight_index += 1
+        weighted_sensor_value = 0
+        weighted_ultrasonic_value = 0
+        time.sleep(1)
 
-        except IOError:
-                print ("Error")
+    except KeyboardInterrupt:   
+        q.join()
+        end_thread = True     
+        break
 
-        except ZeroDivisionError:
-                pass
+    except IOError:
+            print ("Error")
 
+    except ZeroDivisionError:
+            pass
 
-
-if __name__ == '__main__':
-    # client = mqtt.Client()
-    # client.on_message = on_message
-    # client.on_connect = on_connect
-    # client.connect(host="eclipse.usc.edu", port=11000, keepalive=60)
-    # client.loop_start()
-    influx = threading.Thread(target = influx_thread,args=(1,))
-    influx.start()
-    grovepi_threading =threading.Thread(target = grovepi_thread, args=(1,))
-    grovepi_threading.start()
-    while True:
-        try:
-            time.sleep(4)
-        except KeyboardInterrupt:
-            print("killing the threads")
-            end_thread = True
-            break
-   
 
 
 
