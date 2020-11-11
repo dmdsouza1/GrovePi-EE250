@@ -121,10 +121,11 @@ time.sleep(0.5)
 
 while True:
     try:
-        item = control_light_queue.get()
-        digitalWrite(LED_PORT,item)
-        time.sleep(0.2)
-        control_light_queue.task_done()
+        if control_light_queue.empty() == False:
+             item = control_light_queue.get()
+             digitalWrite(LED_PORT,item)
+             time.sleep(0.2)
+             control_light_queue.task_done()
         if(index == 3):
             index = 0
         if(higher_weight_index == 3):
