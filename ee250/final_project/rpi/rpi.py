@@ -18,6 +18,7 @@ lock = threading.Lock()
 end_thread = False
 q = queue.Queue()
 control_light_queue = queue.Queue()
+raw_light_data_queue = queue.Queue()
 def on_connect(client, userdata, flags, rc):
     print("Connected to server (i.e., broker) with result code "+str(rc))
     client.subscribe(hostname + "/led")
@@ -55,10 +56,13 @@ def influx_thread(name):
         try:  
             if q.empty():
                 continue    
-            light_status_number = q.get()   
+            light_status_number = q.get() 
+            raw_light_data = raw_light_data_queue.get()  
             while q.empty() != True:
                 light_status_number = q.get()
                 q.task_done()
+                raw_light_data = raw_light_data_queue.get()
+                raw_light_data_queue.task_done()
 
 
             timeStr = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -70,6 +74,7 @@ def influx_thread(name):
                         "time": timeStr,
                         "fields": {                
                             "light_status": light_status_number
+                            "raw_light_data": 
                         }
                     }
                 ]
@@ -79,6 +84,7 @@ def influx_thread(name):
             print("the light status number after write is", light_status_number)
             time.sleep(10)
             q.task_done()
+            raw_light_data_queue.task_done()
         except KeyboardInterrupt:
             break
 
@@ -149,9 +155,11 @@ while True:
         print("weighted sensor value", weighted_sensor_value)
         if(weighted_sensor_value < light_threshold):
             q.put(1)
+            raw_light_data_queue.put(weighted_sensor_value)
             print("changed status to on")
         else:
             q.put(0)
+            raw_light_data_queue.put(weighted_sensor_value)
             print("changed status to off")
         index += 1
         higher_weight_index += 1
@@ -163,7 +171,9 @@ while True:
         # Turning off the led before you exit
         digitalWrite(LED_PORT,0)  
         time.sleep(0.3)
+        control_light_queue.join()
         q.join()
+        raw_light_data_queue.join()
         end_thread = True     
         break
 
