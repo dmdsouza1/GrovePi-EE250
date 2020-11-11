@@ -98,7 +98,7 @@ ULTRASONIC_PORT = 4     # D4
 LIGHT_SENSOR = 1    #A1
 LED_PORT = 2 # D2
 
-light_threshold = 100
+light_threshold = 300
 ultrasonic_threshold = 20
 resistance = 0
 sensor_value = 1
