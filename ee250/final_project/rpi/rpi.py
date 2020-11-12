@@ -73,8 +73,8 @@ def influx_thread(name):
                         "measurement": "light",            
                         "time": timeStr,
                         "fields": {                
-                            "light_status": light_status_number
-                            "raw_light_data": 
+                            "light_status": light_status_number,
+                            "raw_light_data": raw_light_data
                         }
                     }
                 ]
