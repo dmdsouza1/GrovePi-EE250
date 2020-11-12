@@ -155,14 +155,16 @@ while True:
         print("weighted sensor value", weighted_sensor_value)
         if(weighted_sensor_value < light_threshold):
             q.put(1)
-            raw_light_data_queue.put(weighted_sensor_value)
+            raw_light_data_queue.put(sensor_value)
             print("changed status to on")
         else:
             q.put(0)
-            raw_light_data_queue.put(weighted_sensor_value)
+            raw_light_data_queue.put(sensor_value)
             print("changed status to off")
+        client.publish(hostname + "/ultrasonic", str(ultrasonic_sensor_value))
         index += 1
         higher_weight_index += 1
+
         weighted_sensor_value = 0
         weighted_ultrasonic_value = 0
         time.sleep(1)
