@@ -6,7 +6,6 @@ import queue
 
 from influxdb import InfluxDBClient
 from datetime import datetime
-import random #don't need
 import time
 sys.path.append('/home/pi/Dexter/GrovePi/Software/Python')
 
@@ -14,21 +13,22 @@ import grovepi
 from grovepi import *
 LIGHT_STATUS = 0
 hostname = "dmdsouza"
-lock = threading.Lock()
 end_thread = False
+# Using the queue library to lock the thread and add to or remove from the queue
 q = queue.Queue()
 control_light_queue = queue.Queue()
 raw_light_data_queue = queue.Queue()
+
 def on_connect(client, userdata, flags, rc):
     print("Connected to server (i.e., broker) with result code "+str(rc))
-    client.subscribe(hostname + "/led")
+    client.subscribe(hostname + "/led") #subscribing to the topic LED that is used to control the LED
     client.message_callback_add(hostname + "/led", led_callback)  #custom callback for topic led
     
 def led_callback(client, userdata, message):
     message_recv = str(message.payload, "utf-8")
     if(message_recv == "LED_ON"):
         try:
-            # digitalWrite(LED_PORT,1)     # Send HIGH to switch on LED
+            # adding the command to the queue
             print ("LED ON!")
             control_light_queue.put(1)
             time.sleep(0.2)
@@ -37,7 +37,7 @@ def led_callback(client, userdata, message):
 
     elif(message_recv == "LED_OFF"):
         try:
-            # digitalWrite(LED_PORT,0)     # Send LOW to switch off LED
+            # adding the command to the queue
             print ("LED OFF!")
             control_light_queue.put(0)
             time.sleep(0.2)
@@ -55,19 +55,20 @@ def influx_thread(name):
             break 
         try:  
             if q.empty():
-                continue    
+                continue   
+            #getting the light status and the raw light data from the queues 
             light_status_number = q.get() 
             raw_light_data = raw_light_data_queue.get()  
+            # to get the most recent value from the queue we keep removing from front until the queue is empty
             while q.empty() != True:
                 light_status_number = q.get()
                 q.task_done()
                 raw_light_data = raw_light_data_queue.get()
                 raw_light_data_queue.task_done()
 
-
+            # Gets time to enter in influxDB
             timeStr = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-            print("The light status number before write is", light_status_number)
             json_body = [
                     {
                         "measurement": "light",            
@@ -81,7 +82,7 @@ def influx_thread(name):
 
             client = InfluxDBClient(host = 'daniel-HP-Notebook', port = 8086, username = 'admin', password = 'password', database = 'test_light', ssl = True)
             client.write_points(json_body)
-            print("the light status number after write is", light_status_number)
+            # thread collects data every 10 seconds
             time.sleep(10)
             q.task_done()
             raw_light_data_queue.task_done()
@@ -96,10 +97,10 @@ client.on_message = on_message
 client.on_connect = on_connect
 client.connect(host="eclipse.usc.edu", port=11000, keepalive=60)
 client.loop_start()
+# thread to handle all influxDB operations
 influx = threading.Thread(target = influx_thread, daemon = True, args=(1,))
 influx.start()
-# grovepi_threading =threading.Thread(target = grovepi_thread, args=(1,))
-# grovepi_threading.start()
+
 ULTRASONIC_PORT = 4     # D4
 LIGHT_SENSOR = 1    #A1
 LED_PORT = 2 # D2
@@ -109,11 +110,12 @@ ultrasonic_threshold = 20
 resistance = 0
 sensor_value = 1
 
-NUMBER_OF_PEOPLE_IN_ROOM = 0
+# Using a weighted average to get the sensor data
+# The first, second, third index has the weights 0.25, 0.5, 0.25 respectively
 light_sensor_window = [0,0,0]
-# ultrasonic_sensor_window = [0,0,0]
+
 weighted_sensor_value = 0.0
-# weighted_ultrasonic_value = 0.0
+
 index = 0
 higher_weight_index = 1
 # Setup
@@ -122,11 +124,12 @@ grovepi.pinMode(LIGHT_SENSOR,"INPUT")
 grovepi.pinMode(LED_PORT,"OUTPUT")
 # turning on the light initially
 digitalWrite(LED_PORT,1)
-#getting initial values for the windows
+
 time.sleep(0.5)
 
 while True:
     try:
+        # controlling the light command
         if control_light_queue.empty() == False:
              item = control_light_queue.get()
              digitalWrite(LED_PORT,item)
@@ -141,8 +144,14 @@ while True:
         sensor_value = grovepi.analogRead(LIGHT_SENSOR)
         if(sensor_value == 0):
             sensor_value = 1
+        # Using resistance to get more precision for the light sensor values
         resistance = (float)(1023 - sensor_value) * 10 / sensor_value
+        # if 0 in light_sensor_window:
+        #     light_sensor_window[0] = resistance
+        #     light_sensor_window[1] = resistance
+        #     light_sensor_window[2] = resistance
         light_sensor_window[index] = resistance
+        # calculating the weighted average
         for i in range(3):
             if(i == higher_weight_index):
                 # weighted_ultrasonic_value += ultrasonic_sensor_window[i] * 0.5
@@ -151,7 +160,7 @@ while True:
                 # weighted_ultrasonic_value += ultrasonic_sensor_window[i] * 0.25
                 weighted_sensor_value += light_sensor_window[i] * 0.25
 
-        print("weighted ultrasonic value", ultrasonic_sensor_value)
+        print("raw ultrasonic value", ultrasonic_sensor_value)
         print("weighted sensor value", weighted_sensor_value)
         if(weighted_sensor_value < light_threshold):
             q.put(1)
@@ -161,6 +170,7 @@ while True:
             q.put(0)
             raw_light_data_queue.put(sensor_value)
             print("changed status to off")
+        # publishing the raw ultrasonic data for processing
         client.publish(hostname + "/ultrasonic", str(ultrasonic_sensor_value))
         index += 1
         higher_weight_index += 1
