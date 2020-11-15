@@ -83,9 +83,10 @@ def influx_thread(name):
             client = InfluxDBClient(host = 'daniel-HP-Notebook', port = 8086, username = 'admin', password = 'password', database = 'test_light', ssl = True)
             client.write_points(json_body)
             # thread collects data every 10 seconds
-            time.sleep(10)
             q.task_done()
             raw_light_data_queue.task_done()
+            time.sleep(10)
+            
         except KeyboardInterrupt:
             break
 
