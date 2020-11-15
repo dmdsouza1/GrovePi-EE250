@@ -147,10 +147,10 @@ while True:
             sensor_value = 1
         # Using resistance to get more precision for the light sensor values
         resistance = (float)(1023 - sensor_value) * 10 / sensor_value
-        # if 0 in light_sensor_window:
-        #     light_sensor_window[0] = resistance
-        #     light_sensor_window[1] = resistance
-        #     light_sensor_window[2] = resistance
+        if 0 in light_sensor_window:
+            light_sensor_window[0] = resistance
+            light_sensor_window[1] = resistance
+            light_sensor_window[2] = resistance
         light_sensor_window[index] = resistance
         # calculating the weighted average
         for i in range(3):
