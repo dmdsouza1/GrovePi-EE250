@@ -2,6 +2,8 @@ import paho.mqtt.client as mqtt
 import time
 import queue
 import threading
+from influxdb import InfluxDBClient
+from datetime import datetime
 
 hostname = "dmdsouza"
 count = 0
@@ -9,6 +11,7 @@ threshold_average = 0
 q = queue.Queue()
 
 data_array = queue.Queue()
+influx_data = queue.Queue()
 number_of_people = 0
 
 
@@ -25,6 +28,7 @@ def lightcommand_callback(client, userdata, message):
     print("messsage: ", message_recv)
     q.put(int(message_recv))
     data_array.put(int(message_recv))
+    influx_data.put(int(message_recv))
 
 
 def detect_event(name):
@@ -120,6 +124,22 @@ client.on_connect = on_connect
 client.connect(host="eclipse.usc.edu", port=11000, keepalive=60)
 client.loop_start()
 # create a thread 
+client_influx = InfluxDBClient(host = 'localhost', port = 8086, username = 'admin1', password = 'password', database = 'ultrasonic', ssl = True)
 
 while True:
-    time.sleep(4)
+    if influx_data.empty():
+        continue
+    raw_ultrasonic_data = influx_data.get()
+    influx_data.task_done()
+    timeStr = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    json_body = [
+            {
+                "measurement": "ultrasonic",            
+                "time": timeStr,
+                "fields": {                
+                    "ultrasonic_value": raw_ultrasonic_data
+                }
+            }
+        ]
+    client_influx.write_points(json_body)
