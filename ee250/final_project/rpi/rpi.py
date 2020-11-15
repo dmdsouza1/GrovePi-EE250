@@ -143,7 +143,6 @@ while True:
         ultrasonic_sensor_value = grovepi.ultrasonicRead(ULTRASONIC_PORT)
         time.sleep(0.2)
         sensor_value = grovepi.analogRead(LIGHT_SENSOR)
-        time.sleep(0.2)
         if(sensor_value == 0):
             sensor_value = 1
         # Using resistance to get more precision for the light sensor values
@@ -177,7 +176,7 @@ while True:
 
         weighted_sensor_value = 0
         weighted_ultrasonic_value = 0
-        time.sleep(0.4)
+        time.sleep(0.6)
 
     except KeyboardInterrupt: 
         # Turning off the led before you exit
